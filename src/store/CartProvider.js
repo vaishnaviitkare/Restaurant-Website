@@ -26,12 +26,42 @@ const cartReducer=(state,action)=>{
              //unlike push method of array concat add and return new array
          updatedItems=state.items.concat(action.item);
          }
-       
         return{
             items:updatedItems,
             totalAmount:updatedTotalAmount
          }
         }
+
+        if(action.type==='REMOVE'){
+            const existingCartItemIndex=state.items.findIndex(((item)=>{
+               //in add we have payload item so we write action.item.id
+               //but here in remove direct id is mentioned so we write action.id
+                return item.id===action.id;
+             }))
+             const existingCartItem=state.items[existingCartItemIndex];
+             const updatedTotalAmount=state.totalAmount-existingCartItem.price;
+            let updatedItems;
+            //amount is 1 then remove this item
+            if(existingCartItem.amount===1){
+                updatedItems=state.items.filter((item)=>{
+                      return item.id !== action.id;
+                });
+            }
+            //if greater than one then keep the item just update amount
+           else{
+               const updatedItem={
+                ...existingCartItem,
+                amount:existingCartItem.amount-1
+               }
+               updatedItems=[...state.items];
+               updatedItems[existingCartItemIndex]=updatedItem;
+            }
+            return{
+                items:updatedItems,
+                totalAmount:updatedTotalAmount
+            };
+        }
+
   return defaultCartState;
 }
 
